@@ -11,7 +11,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.andrewsamir.movieapp.Adapters.MovieAdapter;
-import com.example.andrewsamir.movieapp.Data.API_KEYS;
+import com.example.andrewsamir.movieapp.Data.KEYS;
 import com.example.andrewsamir.movieapp.Data.MovieData;
 import com.example.andrewsamir.movieapp.jsonData.MoviesApi;
 import com.google.gson.Gson;
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
 
-        API_KEYS key=new API_KEYS();
+        KEYS key=new KEYS();
 
         String url = "http://api.themoviedb.org/3/movie/popular?api_key="+key.api_key;
 
