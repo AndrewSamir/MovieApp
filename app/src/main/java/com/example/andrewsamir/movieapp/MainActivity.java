@@ -1,7 +1,10 @@
 package com.example.andrewsamir.movieapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -26,12 +29,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final GridView gridView= (GridView) findViewById(R.id.gridView);
+        final ArrayList<MovieData> arrayList_movieData =new ArrayList<>();
+
 
         RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
 
         KEYS key=new KEYS();
 
-        String url = "http://api.themoviedb.org/3/movie/popular?api_key="+key.api_key;
+        String url = "http://api.themoviedb.org/3/movie/top_rated?api_key="+key.api_key;
 
         StringRequest str = new StringRequest(url,
                 new Response.Listener<String>() {
@@ -41,12 +46,10 @@ public class MainActivity extends AppCompatActivity {
 
 
                         Gson gson=new Gson();
-                        Toast.makeText(MainActivity.this, response, Toast.LENGTH_LONG).show();
 
                         MoviesApi movieData=gson.fromJson(response,MoviesApi.class);
 
-                        ArrayList<MovieData> arrayList_movieData =new ArrayList<>();
-                        for(int i=0;i>movieData.getResults().size();i++){
+                        for(int i=0;i<movieData.getResults().size();i++){
 
                             arrayList_movieData.add(new MovieData(movieData.getResults().get(i).getTitle(),
                                     movieData.getResults().get(i).getReleaseDate(),
@@ -68,5 +71,19 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
         queue.add(str);
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent=new Intent(MainActivity.this,Show_Movie.class);
+                intent.putExtra("title",arrayList_movieData.get(position).getName());
+                intent.putExtra("relasedate",arrayList_movieData.get(position).getRelase_date());
+                intent.putExtra("overview",arrayList_movieData.get(position).getOverview());
+                intent.putExtra("rate",arrayList_movieData.get(position).getAvg_vote());
+                intent.putExtra("image",arrayList_movieData.get(position).getImage_path());
+                startActivity(intent);
+            }
+        });
     }
+
 }

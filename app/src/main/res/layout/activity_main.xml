@@ -3,14 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     tools:context=".MainActivity">
 
     <GridView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:numColumns="auto_fit"
-        android:columnWidth="150sp"
-        android:verticalSpacing="5sp"
-        android:horizontalSpacing="5sp"
+        android:padding="2sp"
+        android:columnWidth="170sp"
+        android:background="#000"
+        android:verticalSpacing="2sp"
+        android:horizontalSpacing="2sp"
         android:id="@+id/gridView"/>
 </FrameLayout>
