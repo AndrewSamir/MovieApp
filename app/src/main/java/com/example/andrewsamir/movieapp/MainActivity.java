@@ -13,6 +13,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.andrewsamir.movieapp.Adapters.DBhelper;
 import com.example.andrewsamir.movieapp.Adapters.MovieAdapter;
 import com.example.andrewsamir.movieapp.Data.KEYS;
 import com.example.andrewsamir.movieapp.Data.MovieData;
@@ -22,6 +23,8 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         KEYS key=new KEYS();
 
-        String url = "http://api.themoviedb.org/3/movie/top_rated?api_key="+key.api_key;
+        String url = "http://api.themoviedb.org/3/movie/popular?api_key="+key.api_key;
 
         StringRequest str = new StringRequest(url,
                 new Response.Listener<String>() {
@@ -51,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
 
                         for(int i=0;i<movieData.getResults().size();i++){
 
-                            arrayList_movieData.add(new MovieData(movieData.getResults().get(i).getTitle(),
+                            arrayList_movieData.add(new MovieData(movieData.getResults().get(i).getId(),
+                                    movieData.getResults().get(i).getTitle(),
                                     movieData.getResults().get(i).getReleaseDate(),
                                     movieData.getResults().get(i).getPosterPath(),
                                     movieData.getResults().get(i).getOverview(),
@@ -75,7 +79,9 @@ public class MainActivity extends AppCompatActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
                 Intent intent=new Intent(MainActivity.this,Show_Movie.class);
+                intent.putExtra("id",arrayList_movieData.get(position).getId());
                 intent.putExtra("title",arrayList_movieData.get(position).getName());
                 intent.putExtra("relasedate",arrayList_movieData.get(position).getRelase_date());
                 intent.putExtra("overview",arrayList_movieData.get(position).getOverview());
