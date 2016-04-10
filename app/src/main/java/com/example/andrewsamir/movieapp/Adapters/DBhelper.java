@@ -69,7 +69,7 @@ public class DBhelper extends SQLiteOpenHelper {
         SQLiteDatabase db=this.getWritableDatabase();
         db.delete(TABLE_NAME,ID+" = "+id,null);
     }
-    public Cursor getMeetings() {
+    public Cursor getMoviess() {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM "+TABLE_NAME,null);
     }
