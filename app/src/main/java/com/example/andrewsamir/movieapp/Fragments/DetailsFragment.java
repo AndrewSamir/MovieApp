@@ -1,0 +1,141 @@
+package com.example.andrewsamir.movieapp.Fragments;
+
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.example.andrewsamir.movieapp.Adapters.DBhelper;
+import com.example.andrewsamir.movieapp.R;
+import com.squareup.picasso.Picasso;
+
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class DetailsFragment extends Fragment {
+
+
+    private static final String ARG_TITLE = "TITLE";
+    private static final String ARG_IMAGEPATH ="IMAGEPATH" ;
+    private static final String ARG_RELASEDATE ="RELASEDATE" ;
+    private static final String ARG_OVERVIEW ="OVERVIEW" ;
+    private static final String ARG_RATE ="RATE" ;
+    private static final String ARG_ID ="ID" ;
+
+    DBhelper myDB;
+
+    ImageView imageView ;
+    TextView title ;
+    TextView relasedate ;
+    TextView overview ;
+    TextView rating ;
+    CheckBox Star ;
+
+
+
+    public DetailsFragment() {
+        // Required empty public constructor
+    }
+
+
+    public  static  DetailsFragment getinstance(String title,String relasedate,String overview,String imagepath,Double rate,int id){
+        Bundle bundle=new Bundle();
+        bundle.putString(ARG_TITLE,title);
+        bundle.putString(ARG_RELASEDATE,relasedate);
+        bundle.putString(ARG_OVERVIEW,overview);
+        bundle.putString(ARG_IMAGEPATH, imagepath);
+        bundle.putDouble(ARG_RATE, rate);
+        bundle.putInt(ARG_ID,id);
+        DetailsFragment detailsFragment = new DetailsFragment();
+        detailsFragment.setArguments(bundle);
+
+        return detailsFragment;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragmentLayoutInflater layoutInflater = getActivity().getLayoutInflater();
+
+        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+        View view = layoutInflater.inflate(R.layout.fragment_details, container, false);
+
+        myDB = new DBhelper(getActivity());
+
+
+         imageView = (ImageView) view.findViewById(R.id.imageViewShowImage_);
+         title = (TextView) view.findViewById(R.id.textViewShowTitle_);
+         relasedate = (TextView) view.findViewById(R.id.textViewRelaseDate_);
+         overview = (TextView) view.findViewById(R.id.textViewShowOverview_);
+         rating = (TextView) view.findViewById(R.id.textViewRating_);
+         Star = (CheckBox) view.findViewById(R.id.StarID_);
+
+
+
+        return view;
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+
+        title.setText(getArguments().getString(ARG_TITLE));
+        relasedate.setText(getArguments().getString(ARG_RELASEDATE));
+        overview.setText(getArguments().getString(ARG_OVERVIEW));
+        rating.setText(getArguments().getDouble(ARG_RATE) + "/10");
+
+        final SharedPreferences sharedPreferences = getActivity().getSharedPreferences("FAVOURITE", Context.MODE_PRIVATE);
+
+
+        Star.setChecked(sharedPreferences.getBoolean("" + getArguments().getInt(ARG_ID), false));
+
+
+        Star.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                if (isChecked) {
+                    editor.putBoolean("" + getArguments().getInt(ARG_ID), true);
+
+                    boolean bb = myDB.ADD(getArguments().getInt(ARG_ID),
+                            getArguments().getString(ARG_TITLE),
+                            getArguments().getString(ARG_RELASEDATE),
+                            getArguments().getString(ARG_IMAGEPATH),
+                            getArguments().getString(ARG_OVERVIEW),
+                            getArguments().getString(ARG_RATE));
+                    if (bb)
+                        ;
+                } else {
+                    editor.putBoolean("" + getArguments().getInt(ARG_ID), false);
+                    myDB.deletemovie(getArguments().getInt(ARG_ID));
+                }
+                editor.commit();
+            }
+        });
+
+
+        Context c = getActivity().getApplicationContext();
+
+
+        Picasso.with(c).load("http://image.tmdb.org/t/p/w185//" + getArguments().getString(ARG_IMAGEPATH)).into(imageView);
+
+
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+
+    }
+}

@@ -20,6 +20,7 @@ import com.example.andrewsamir.movieapp.Adapters.DBhelper;
 import com.example.andrewsamir.movieapp.Adapters.MovieAdapter;
 import com.example.andrewsamir.movieapp.Data.KEYS;
 import com.example.andrewsamir.movieapp.Data.MovieData;
+import com.example.andrewsamir.movieapp.Fragments.DetailsFragment;
 import com.example.andrewsamir.movieapp.jsonData.MoviesApi;
 import com.google.gson.Gson;
 
@@ -31,11 +32,24 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<MovieData> arrayList_movieData;
     DBhelper myDB;
 
+    private boolean isTablet;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
+        if (findViewById(R.id.detailmoviecontainer) == null) {
+            //mobile
+
+            isTablet = false;
+        } else {
+            //tablet
+            isTablet = true;
+        }
 
         gridView = (GridView) findViewById(R.id.gridView);
         arrayList_movieData = new ArrayList<>();
@@ -88,6 +102,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main2, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main2,menu);
         return true;
     }
 
@@ -230,14 +250,34 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
 
-                Intent intent = new Intent(MainActivity.this, Show_Movie.class);
-                intent.putExtra("id", arrayList_movieData.get(position).getId());
-                intent.putExtra("title", arrayList_movieData.get(position).getName());
-                intent.putExtra("relasedate", arrayList_movieData.get(position).getRelase_date());
-                intent.putExtra("overview", arrayList_movieData.get(position).getOverview());
-                intent.putExtra("rate", arrayList_movieData.get(position).getAvg_vote());
-                intent.putExtra("image", arrayList_movieData.get(position).getImage_path());
-                startActivity(intent);
+                if (isTablet) {
+
+                    DetailsFragment detailsFragment = DetailsFragment.getinstance(arrayList_movieData.get(position).getName(),
+                            arrayList_movieData.get(position).getRelase_date(),
+                            arrayList_movieData.get(position).getOverview(),
+                            arrayList_movieData.get(position).getImage_path(),
+                            arrayList_movieData.get(position).getAvg_vote(),
+                            arrayList_movieData.get(position).getId()
+                            );
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .addToBackStack(null)
+                            .replace(R.id.detailmoviecontainer,detailsFragment)
+                            .commit();
+
+
+
+                } else {
+
+                    Intent intent = new Intent(MainActivity.this, Show_Movie.class);
+                    intent.putExtra("id", arrayList_movieData.get(position).getId());
+                    intent.putExtra("title", arrayList_movieData.get(position).getName());
+                    intent.putExtra("relasedate", arrayList_movieData.get(position).getRelase_date());
+                    intent.putExtra("overview", arrayList_movieData.get(position).getOverview());
+                    intent.putExtra("rate", arrayList_movieData.get(position).getAvg_vote());
+                    intent.putExtra("image", arrayList_movieData.get(position).getImage_path());
+                    startActivity(intent);
+                }
             }
         });
     }
