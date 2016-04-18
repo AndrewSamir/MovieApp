@@ -8,14 +8,18 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.andrewsamir.movieapp.Adapters.DBhelper;
 import com.example.andrewsamir.movieapp.R;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,21 +28,24 @@ public class DetailsFragment extends Fragment {
 
 
     private static final String ARG_TITLE = "TITLE";
-    private static final String ARG_IMAGEPATH ="IMAGEPATH" ;
-    private static final String ARG_RELASEDATE ="RELASEDATE" ;
-    private static final String ARG_OVERVIEW ="OVERVIEW" ;
-    private static final String ARG_RATE ="RATE" ;
-    private static final String ARG_ID ="ID" ;
+    private static final String ARG_IMAGEPATH = "IMAGEPATH";
+    private static final String ARG_RELASEDATE = "RELASEDATE";
+    private static final String ARG_OVERVIEW = "OVERVIEW";
+    private static final String ARG_RATE = "RATE";
+    private static final String ARG_ID = "ID";
+    private static final String ARG_NAMES = "NAMES";
+    private static final String ARG_KEYS = "KEYS";
 
     DBhelper myDB;
 
-    ImageView imageView ;
-    TextView title ;
-    TextView relasedate ;
-    TextView overview ;
-    TextView rating ;
-    CheckBox Star ;
-
+    ImageView imageView;
+    TextView title;
+    TextView relasedate;
+    TextView overview;
+    TextView rating;
+    CheckBox Star;
+    Button button;
+    LinearLayout linearLayout;
 
 
     public DetailsFragment() {
@@ -46,14 +53,17 @@ public class DetailsFragment extends Fragment {
     }
 
 
-    public  static  DetailsFragment getinstance(String title,String relasedate,String overview,String imagepath,Double rate,int id){
-        Bundle bundle=new Bundle();
-        bundle.putString(ARG_TITLE,title);
-        bundle.putString(ARG_RELASEDATE,relasedate);
-        bundle.putString(ARG_OVERVIEW,overview);
+    public static DetailsFragment getinstance(String title, String relasedate, String overview, String imagepath,
+                                              Double rate, int id, ArrayList<String> names, ArrayList<String> keys) {
+        Bundle bundle = new Bundle();
+        bundle.putString(ARG_TITLE, title);
+        bundle.putString(ARG_RELASEDATE, relasedate);
+        bundle.putString(ARG_OVERVIEW, overview);
         bundle.putString(ARG_IMAGEPATH, imagepath);
         bundle.putDouble(ARG_RATE, rate);
-        bundle.putInt(ARG_ID,id);
+        bundle.putStringArrayList(ARG_NAMES, names);
+        bundle.putStringArrayList(ARG_KEYS, keys);
+        bundle.putInt(ARG_ID, id);
         DetailsFragment detailsFragment = new DetailsFragment();
         detailsFragment.setArguments(bundle);
 
@@ -70,14 +80,13 @@ public class DetailsFragment extends Fragment {
 
         myDB = new DBhelper(getActivity());
 
-
-         imageView = (ImageView) view.findViewById(R.id.imageViewShowImage_);
-         title = (TextView) view.findViewById(R.id.textViewShowTitle_);
-         relasedate = (TextView) view.findViewById(R.id.textViewRelaseDate_);
-         overview = (TextView) view.findViewById(R.id.textViewShowOverview_);
-         rating = (TextView) view.findViewById(R.id.textViewRating_);
-         Star = (CheckBox) view.findViewById(R.id.StarID_);
-
+        linearLayout = (LinearLayout) view.findViewById(R.id.linVideos);
+        imageView = (ImageView) view.findViewById(R.id.imageViewShowImage_);
+        title = (TextView) view.findViewById(R.id.textViewShowTitle_);
+        relasedate = (TextView) view.findViewById(R.id.textViewRelaseDate_);
+        overview = (TextView) view.findViewById(R.id.textViewShowOverview_);
+        rating = (TextView) view.findViewById(R.id.textViewRating_);
+        Star = (CheckBox) view.findViewById(R.id.StarID_);
 
 
         return view;
@@ -87,6 +96,22 @@ public class DetailsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+
+        int i = 0;
+        ArrayList<String> da=new ArrayList<>();
+        int num = getArguments().getStringArrayList(ARG_NAMES).size();
+        for(int x=0;x<num;x++) {
+            da.add(getArguments().getStringArrayList(ARG_NAMES).get(x));
+        }
+        for (String s : da) {
+
+            button = new Button(getActivity());
+            button.setId(i);
+            i++;
+            button.setText(s);
+            linearLayout.addView(button);
+
+        }
 
 
         title.setText(getArguments().getString(ARG_TITLE));

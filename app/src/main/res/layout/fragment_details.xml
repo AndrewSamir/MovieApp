@@ -109,6 +109,13 @@
                 android:padding="10sp"
                 android:text="Medium Text"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:id="@+id/linVideos"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

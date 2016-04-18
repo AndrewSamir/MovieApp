@@ -24,6 +24,10 @@ import com.example.andrewsamir.movieapp.Fragments.DetailsFragment;
 import com.example.andrewsamir.movieapp.jsonData.MoviesApi;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     GridView gridView;
     ArrayList<MovieData> arrayList_movieData;
     DBhelper myDB;
+    ArrayList<String> names,keys;
 
     private boolean isTablet;
 
@@ -41,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
+        names=new ArrayList<>();
+        keys= new ArrayList<>();
 
         if (findViewById(R.id.detailmoviecontainer) == null) {
             //mobile
@@ -252,12 +259,52 @@ public class MainActivity extends AppCompatActivity {
 
                 if (isTablet) {
 
+
+                    RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+
+                    KEYS key = new KEYS();
+
+                    String url = "http://api.themoviedb.org/3/movie/"+arrayList_movieData.get(position).getId()+"/videos?api_key=" + key.api_key;
+
+                    StringRequest str = new StringRequest(url,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+
+                                    try {
+                                        JSONObject allData=new JSONObject(response);
+                                        JSONArray jsonArray=allData.getJSONArray("results");
+                                        int num=jsonArray.length();
+                                        names.clear();
+                                        keys.clear();
+                                        for(int i=0;i<num;i++){
+
+                                            names.add(jsonArray.getJSONObject(i).getString("name"));
+                                            keys.add(jsonArray.getJSONObject(i).getString("key"));
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+
+                                }
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+
+                                }
+                            });
+                    queue.add(str);
+
                     DetailsFragment detailsFragment = DetailsFragment.getinstance(arrayList_movieData.get(position).getName(),
                             arrayList_movieData.get(position).getRelase_date(),
                             arrayList_movieData.get(position).getOverview(),
                             arrayList_movieData.get(position).getImage_path(),
                             arrayList_movieData.get(position).getAvg_vote(),
-                            arrayList_movieData.get(position).getId()
+                            arrayList_movieData.get(position).getId(),
+                            names,keys
                             );
                     getSupportFragmentManager()
                             .beginTransaction()
