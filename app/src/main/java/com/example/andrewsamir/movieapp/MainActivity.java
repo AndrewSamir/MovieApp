@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
 
                 if (isTablet) {
@@ -285,19 +285,6 @@ public class MainActivity extends AppCompatActivity {
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
-
-
-                                }
-                            },
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
-
-                                }
-                            });
-                    queue.add(str);
-
                     DetailsFragment detailsFragment = DetailsFragment.getinstance(arrayList_movieData.get(position).getName(),
                             arrayList_movieData.get(position).getRelase_date(),
                             arrayList_movieData.get(position).getOverview(),
@@ -311,6 +298,34 @@ public class MainActivity extends AppCompatActivity {
                             .addToBackStack(null)
                             .replace(R.id.detailmoviecontainer,detailsFragment)
                             .commit();
+
+
+                                }
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+
+                                }
+                            });
+                    queue.add(str);
+
+/*
+                    DetailsFragment detailsFragment = DetailsFragment.getinstance(arrayList_movieData.get(position).getName(),
+                            arrayList_movieData.get(position).getRelase_date(),
+                            arrayList_movieData.get(position).getOverview(),
+                            arrayList_movieData.get(position).getImage_path(),
+                            arrayList_movieData.get(position).getAvg_vote(),
+                            arrayList_movieData.get(position).getId(),
+                            names,keys
+                            );
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .addToBackStack(null)
+                            .replace(R.id.detailmoviecontainer,detailsFragment)
+                            .commit();
+*/
 
 
 
