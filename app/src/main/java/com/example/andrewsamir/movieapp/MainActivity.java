@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     GridView gridView;
     ArrayList<MovieData> arrayList_movieData;
     DBhelper myDB;
-    ArrayList<String> names,keys;
+    ArrayList<String> names, keys;
 
     private boolean isTablet;
 
@@ -45,9 +45,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        names=new ArrayList<>();
-        keys= new ArrayList<>();
+        names = new ArrayList<>();
+        keys = new ArrayList<>();
 
         if (findViewById(R.id.detailmoviecontainer) == null) {
             //mobile
@@ -114,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main2,menu);
+        getMenuInflater().inflate(R.menu.menu_main2, menu);
         return true;
     }
 
@@ -260,44 +259,65 @@ public class MainActivity extends AppCompatActivity {
                 if (isTablet) {
 
 
-                    RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+                    final RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
 
                     KEYS key = new KEYS();
 
-                    String url = "http://api.themoviedb.org/3/movie/"+arrayList_movieData.get(position).getId()+"/videos?api_key=" + key.api_key;
+                    String url = "http://api.themoviedb.org/3/movie/" + arrayList_movieData.get(position).getId() + "/videos?api_key=" + key.api_key;
+                    final String url_rev = "http://api.themoviedb.org/3/movie/" + arrayList_movieData.get(position).getId() + "/reviews?api_key=" + key.api_key;
 
                     StringRequest str = new StringRequest(url,
                             new Response.Listener<String>() {
                                 @Override
-                                public void onResponse(String response) {
+                                public void onResponse(final String response) {
 
-                                    try {
-                                        JSONObject allData=new JSONObject(response);
-                                        JSONArray jsonArray=allData.getJSONArray("results");
-                                        int num=jsonArray.length();
-                                        names.clear();
-                                        keys.clear();
-                                        for(int i=0;i<num;i++){
 
-                                            names.add(jsonArray.getJSONObject(i).getString("name"));
-                                            keys.add(jsonArray.getJSONObject(i).getString("key"));
-                                        }
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                    DetailsFragment detailsFragment = DetailsFragment.getinstance(arrayList_movieData.get(position).getName(),
-                            arrayList_movieData.get(position).getRelase_date(),
-                            arrayList_movieData.get(position).getOverview(),
-                            arrayList_movieData.get(position).getImage_path(),
-                            arrayList_movieData.get(position).getAvg_vote(),
-                            arrayList_movieData.get(position).getId(),
-                            names,keys
-                            );
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .addToBackStack(null)
-                            .replace(R.id.detailmoviecontainer,detailsFragment)
-                            .commit();
+                                    StringRequest str = new StringRequest(url_rev,
+                                            new Response.Listener<String>() {
+                                                @Override
+                                                public void onResponse(String response_rev) {
+
+                                                    Toast.makeText(MainActivity.this, response_rev, Toast.LENGTH_LONG).show();
+
+                                                    try {
+                                                        JSONObject allData = new JSONObject(response);
+                                                        JSONArray jsonArray = allData.getJSONArray("results");
+                                                        int num = jsonArray.length();
+                                                        names.clear();
+                                                        keys.clear();
+                                                        for (int i = 0; i < num; i++) {
+
+                                                            names.add(jsonArray.getJSONObject(i).getString("name"));
+                                                            keys.add(jsonArray.getJSONObject(i).getString("key"));
+                                                        }
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    DetailsFragment detailsFragment = DetailsFragment.getinstance(arrayList_movieData.get(position).getName(),
+                                                            arrayList_movieData.get(position).getRelase_date(),
+                                                            arrayList_movieData.get(position).getOverview(),
+                                                            arrayList_movieData.get(position).getImage_path(),
+                                                            arrayList_movieData.get(position).getAvg_vote(),
+                                                            arrayList_movieData.get(position).getId(),
+                                                            names, keys
+                                                    );
+                                                    getSupportFragmentManager()
+                                                            .beginTransaction()
+                                                            .addToBackStack(null)
+                                                            .replace(R.id.detailmoviecontainer, detailsFragment)
+                                                            .commit();
+
+
+                                                }
+                                            },
+                                            new Response.ErrorListener() {
+                                                @Override
+                                                public void onErrorResponse(VolleyError error) {
+                                                    Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+
+                                                }
+                                            });
+                                    queue.add(str);
 
 
                                 }
@@ -310,23 +330,6 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                     queue.add(str);
-
-/*
-                    DetailsFragment detailsFragment = DetailsFragment.getinstance(arrayList_movieData.get(position).getName(),
-                            arrayList_movieData.get(position).getRelase_date(),
-                            arrayList_movieData.get(position).getOverview(),
-                            arrayList_movieData.get(position).getImage_path(),
-                            arrayList_movieData.get(position).getAvg_vote(),
-                            arrayList_movieData.get(position).getId(),
-                            names,keys
-                            );
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .addToBackStack(null)
-                            .replace(R.id.detailmoviecontainer,detailsFragment)
-                            .commit();
-*/
-
 
 
                 } else {

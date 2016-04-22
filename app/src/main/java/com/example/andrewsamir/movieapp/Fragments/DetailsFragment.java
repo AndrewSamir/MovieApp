@@ -2,7 +2,9 @@ package com.example.andrewsamir.movieapp.Fragments;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.andrewsamir.movieapp.Adapters.DBhelper;
 import com.example.andrewsamir.movieapp.R;
@@ -46,6 +49,7 @@ public class DetailsFragment extends Fragment {
     CheckBox Star;
     Button button;
     LinearLayout linearLayout;
+    ArrayList<String> KEYS;
 
 
     public DetailsFragment() {
@@ -73,7 +77,6 @@ public class DetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragmentLayoutInflater layoutInflater = getActivity().getLayoutInflater();
 
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
         View view = layoutInflater.inflate(R.layout.fragment_details, container, false);
@@ -98,15 +101,18 @@ public class DetailsFragment extends Fragment {
         super.onStart();
 
         int i = 0;
-        ArrayList<String> da=new ArrayList<>();
+        ArrayList<String> da = new ArrayList<>();
+        KEYS = new ArrayList<>();
         int num = getArguments().getStringArrayList(ARG_NAMES).size();
-        for(int x=0;x<num;x++) {
+        for (int x = 0; x < num; x++) {
             da.add(getArguments().getStringArrayList(ARG_NAMES).get(x));
+            KEYS.add(getArguments().getStringArrayList(ARG_KEYS).get(x));
         }
         for (String s : da) {
 
             button = new Button(getActivity());
             button.setId(i);
+            button.setOnClickListener(gotoCLICK(button));
             i++;
             button.setText(s);
             linearLayout.addView(button);
@@ -155,6 +161,17 @@ public class DetailsFragment extends Fragment {
         Picasso.with(c).load("http://image.tmdb.org/t/p/w185//" + getArguments().getString(ARG_IMAGEPATH)).into(imageView);
 
 
+    }
+
+    View.OnClickListener gotoCLICK(final Button button) {
+        return new View.OnClickListener() {
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), button.getId() + "", Toast.LENGTH_LONG).show();
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v="
+                        + KEYS.get(button.getId()))));
+
+            }
+        };
     }
 
     @Override
