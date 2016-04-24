@@ -17,16 +17,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Show_Movie" >
+        <activity android:name=".Show_Movie"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.Show_Movie" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".Settings" >
-            <intent-filter>
-                <action android:name="android.intent.action.Settings" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

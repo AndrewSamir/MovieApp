@@ -6,22 +6,11 @@
 
     tools:context=".MainActivity">
 
-    <!--<GridView-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="fill_parent"-->
-        <!--android:numColumns="auto_fit"-->
-        <!--android:padding="2sp"-->
-        <!--android:columnWidth="150sp"-->
-        <!--android:background="#660000"-->
-        <!--android:stretchMode="columnWidth"-->
-        <!--android:verticalSpacing="2sp"-->
-        <!--android:horizontalSpacing="2sp"-->
-        <!--android:id="@+id/gridView"/>-->
-    
+
     <fragment
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:id="@+id/fragment_movies_grid"
         android:name="com.example.andrewsamir.movieapp.MoviesGrid"
-        android:id="@+id/fragment_movies_grid"/>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </FrameLayout>

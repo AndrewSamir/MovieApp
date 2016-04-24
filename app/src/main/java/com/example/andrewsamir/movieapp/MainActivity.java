@@ -3,7 +3,7 @@ package com.example.andrewsamir.movieapp;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,12 +30,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends ActionBarActivity {
 
     GridView gridView;
     ArrayList<MovieData> arrayList_movieData;
     DBhelper myDB;
-    ArrayList<String> names, keys;
+    ArrayList<String> names, keys, au, reviews;
 
     private boolean isTablet;
 
@@ -47,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
 
         names = new ArrayList<>();
         keys = new ArrayList<>();
+
+        au = new ArrayList<>();
+        reviews = new ArrayList<>();
 
         if (findViewById(R.id.detailmoviecontainer) == null) {
             //mobile
@@ -111,11 +114,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main2, menu);
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -139,11 +137,8 @@ public class MainActivity extends AppCompatActivity {
                                 Double.parseDouble(cursor.getString(5))));
 
                     } while (cursor.moveToNext());
-
-
                     MovieAdapter movieAdapter = new MovieAdapter(arrayList_movieData, MainActivity.this);
                     gridView.setAdapter(movieAdapter);
-
                 }
                 create();
                 return true;
@@ -151,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.popular:
                 arrayList_movieData.clear();
-
 
                 RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
 
@@ -277,7 +271,20 @@ public class MainActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onResponse(String response_rev) {
 
-                                                    Toast.makeText(MainActivity.this, response_rev, Toast.LENGTH_LONG).show();
+                                                    try {
+                                                        JSONObject ALL_reviews = new JSONObject(response_rev);
+                                                        JSONArray reviews_Array = ALL_reviews.getJSONArray("results");
+                                                        int num = reviews_Array.length();
+                                                        reviews.clear();
+                                                        au.clear();
+                                                        for (int i = 0; i < num; i++) {
+
+                                                            reviews.add(reviews_Array.getJSONObject(i).getString("content"));
+                                                            au.add(reviews_Array.getJSONObject(i).getString("author"));
+                                                        }
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
 
                                                     try {
                                                         JSONObject allData = new JSONObject(response);
@@ -299,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
                                                             arrayList_movieData.get(position).getImage_path(),
                                                             arrayList_movieData.get(position).getAvg_vote(),
                                                             arrayList_movieData.get(position).getId(),
-                                                            names, keys
+                                                            names, keys, au, reviews
                                                     );
                                                     getSupportFragmentManager()
                                                             .beginTransaction()
@@ -334,14 +341,92 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
 
-                    Intent intent = new Intent(MainActivity.this, Show_Movie.class);
-                    intent.putExtra("id", arrayList_movieData.get(position).getId());
-                    intent.putExtra("title", arrayList_movieData.get(position).getName());
-                    intent.putExtra("relasedate", arrayList_movieData.get(position).getRelase_date());
-                    intent.putExtra("overview", arrayList_movieData.get(position).getOverview());
-                    intent.putExtra("rate", arrayList_movieData.get(position).getAvg_vote());
-                    intent.putExtra("image", arrayList_movieData.get(position).getImage_path());
-                    startActivity(intent);
+
+                    final RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+
+                    KEYS key = new KEYS();
+
+                    String url = "http://api.themoviedb.org/3/movie/" + arrayList_movieData.get(position).getId() + "/videos?api_key=" + key.api_key;
+                    final String url_rev = "http://api.themoviedb.org/3/movie/" + arrayList_movieData.get(position).getId() + "/reviews?api_key=" + key.api_key;
+
+                    StringRequest str = new StringRequest(url,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(final String response) {
+
+
+                                    StringRequest str = new StringRequest(url_rev,
+                                            new Response.Listener<String>() {
+                                                @Override
+                                                public void onResponse(String response_rev) {
+
+                                                    try {
+                                                        JSONObject ALL_reviews = new JSONObject(response_rev);
+                                                        JSONArray reviews_Array = ALL_reviews.getJSONArray("results");
+                                                        int num = reviews_Array.length();
+                                                        reviews.clear();
+                                                        au.clear();
+                                                        for (int i = 0; i < num; i++) {
+
+                                                            reviews.add(reviews_Array.getJSONObject(i).getString("content"));
+                                                            au.add(reviews_Array.getJSONObject(i).getString("author"));
+                                                        }
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+
+                                                    try {
+                                                        JSONObject allData = new JSONObject(response);
+                                                        JSONArray jsonArray = allData.getJSONArray("results");
+                                                        int num = jsonArray.length();
+                                                        names.clear();
+                                                        keys.clear();
+                                                        for (int i = 0; i < num; i++) {
+
+                                                            names.add(jsonArray.getJSONObject(i).getString("name"));
+                                                            keys.add(jsonArray.getJSONObject(i).getString("key"));
+                                                        }
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+
+                                                    Intent intent = new Intent(MainActivity.this, Show_Movie.class);
+                                                    intent.putExtra("id", arrayList_movieData.get(position).getId());
+                                                    intent.putExtra("title", arrayList_movieData.get(position).getName());
+                                                    intent.putExtra("relasedate", arrayList_movieData.get(position).getRelase_date());
+                                                    intent.putExtra("overview", arrayList_movieData.get(position).getOverview());
+                                                    intent.putExtra("rate", arrayList_movieData.get(position).getAvg_vote());
+                                                    intent.putExtra("image", arrayList_movieData.get(position).getImage_path());
+                                                    intent.putExtra("names", names);
+                                                    intent.putExtra("keys", keys);
+                                                    intent.putExtra("au", au);
+                                                    intent.putExtra("reviews", reviews);
+                                                    startActivity(intent);
+
+                                                }
+                                            },
+                                            new Response.ErrorListener() {
+                                                @Override
+                                                public void onErrorResponse(VolleyError error) {
+                                                    Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+
+                                                }
+                                            });
+                                    queue.add(str);
+
+
+                                }
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+
+                                }
+                            });
+                    queue.add(str);
+
+
                 }
             }
         });

@@ -4,9 +4,13 @@ package com.example.andrewsamir.movieapp.Fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +20,6 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.andrewsamir.movieapp.Adapters.DBhelper;
 import com.example.andrewsamir.movieapp.R;
@@ -38,6 +41,8 @@ public class DetailsFragment extends Fragment {
     private static final String ARG_ID = "ID";
     private static final String ARG_NAMES = "NAMES";
     private static final String ARG_KEYS = "KEYS";
+    private static final String ARG_AU = "AU";
+    private static final String ARG_REVIEWS = "REVIEWS";
 
     DBhelper myDB;
 
@@ -48,7 +53,8 @@ public class DetailsFragment extends Fragment {
     TextView rating;
     CheckBox Star;
     Button button;
-    LinearLayout linearLayout;
+    LinearLayout linearLayout, linear_reviews, linear_video_item;
+    TextView author, content;
     ArrayList<String> KEYS;
 
 
@@ -58,7 +64,8 @@ public class DetailsFragment extends Fragment {
 
 
     public static DetailsFragment getinstance(String title, String relasedate, String overview, String imagepath,
-                                              Double rate, int id, ArrayList<String> names, ArrayList<String> keys) {
+                                              Double rate, int id, ArrayList<String> names, ArrayList<String> keys,
+                                              ArrayList<String> authoers, ArrayList<String> reviews) {
         Bundle bundle = new Bundle();
         bundle.putString(ARG_TITLE, title);
         bundle.putString(ARG_RELASEDATE, relasedate);
@@ -67,6 +74,8 @@ public class DetailsFragment extends Fragment {
         bundle.putDouble(ARG_RATE, rate);
         bundle.putStringArrayList(ARG_NAMES, names);
         bundle.putStringArrayList(ARG_KEYS, keys);
+        bundle.putStringArrayList(ARG_AU, authoers);
+        bundle.putStringArrayList(ARG_REVIEWS, reviews);
         bundle.putInt(ARG_ID, id);
         DetailsFragment detailsFragment = new DetailsFragment();
         detailsFragment.setArguments(bundle);
@@ -84,6 +93,8 @@ public class DetailsFragment extends Fragment {
         myDB = new DBhelper(getActivity());
 
         linearLayout = (LinearLayout) view.findViewById(R.id.linVideos);
+        linear_reviews = (LinearLayout) view.findViewById(R.id.linreviews);
+        linear_reviews = (LinearLayout) view.findViewById(R.id.linreviews);
         imageView = (ImageView) view.findViewById(R.id.imageViewShowImage_);
         title = (TextView) view.findViewById(R.id.textViewShowTitle_);
         relasedate = (TextView) view.findViewById(R.id.textViewRelaseDate_);
@@ -115,10 +126,65 @@ public class DetailsFragment extends Fragment {
             button.setOnClickListener(gotoCLICK(button));
             i++;
             button.setText(s);
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 8, 0, 8);
+            button.setLayoutParams(params);
+            Drawable img = getContext().getResources().getDrawable(R.drawable.video);
+            img.setBounds(0, 0, 120, 120);
+            button.setCompoundDrawables(img, null, null, null);
+            button.setTextSize(25);
+            button.setPadding(10, 10, 10, 10);
+            button.setBackgroundResource(R.drawable.rect);
+            button.setTextColor(Color.parseColor("#ffffff"));
+
             linearLayout.addView(button);
 
         }
 
+        int n = 0;
+        ArrayList<String> reviews = new ArrayList<>();
+        ArrayList<String> authors = new ArrayList<>();
+
+        int numb = getArguments().getStringArrayList(ARG_AU).size();
+        for (int x = 0; x < numb; x++) {
+            reviews.add(getArguments().getStringArrayList(ARG_REVIEWS).get(x));
+            authors.add(getArguments().getStringArrayList(ARG_AU).get(x));
+        }
+        if (reviews.isEmpty()) ;
+        else {
+            author = new TextView(getActivity());
+            author.setPadding(0, 20, 0, 5);
+            author.setTextSize(30);
+            author.setGravity(Gravity.CENTER);
+            author.setPaintFlags(author.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+
+            author.setTextColor(Color.parseColor("#000000"));
+            author.setText("REVIEWS");
+            linear_reviews.addView(author);
+
+
+        }
+        for (String s : reviews) {
+
+            author = new TextView(getActivity());
+            author.setId(1000 + n);
+            author.setPadding(0, 20, 0, 5);
+            author.setTextSize(20);
+            author.setTextColor(Color.parseColor("#000000"));
+            author.setText(authors.get(n));
+
+            content = new TextView(getActivity());
+            content.setId(2000 + n);
+            content.setPadding(30, 5, 20, 30);
+            content.setText(s);
+
+            linear_reviews.addView(author);
+            linear_reviews.addView(content);
+
+            n++;
+        }
 
         title.setText(getArguments().getString(ARG_TITLE));
         relasedate.setText(getArguments().getString(ARG_RELASEDATE));
@@ -126,7 +192,6 @@ public class DetailsFragment extends Fragment {
         rating.setText(getArguments().getDouble(ARG_RATE) + "/10");
 
         final SharedPreferences sharedPreferences = getActivity().getSharedPreferences("FAVOURITE", Context.MODE_PRIVATE);
-
 
         Star.setChecked(sharedPreferences.getBoolean("" + getArguments().getInt(ARG_ID), false));
 
@@ -143,7 +208,7 @@ public class DetailsFragment extends Fragment {
                             getArguments().getString(ARG_RELASEDATE),
                             getArguments().getString(ARG_IMAGEPATH),
                             getArguments().getString(ARG_OVERVIEW),
-                            getArguments().getString(ARG_RATE));
+                            getArguments().getDouble(ARG_RATE) + "");
                     if (bb)
                         ;
                 } else {
@@ -154,19 +219,14 @@ public class DetailsFragment extends Fragment {
             }
         });
 
-
         Context c = getActivity().getApplicationContext();
 
-
         Picasso.with(c).load("http://image.tmdb.org/t/p/w185//" + getArguments().getString(ARG_IMAGEPATH)).into(imageView);
-
-
     }
 
     View.OnClickListener gotoCLICK(final Button button) {
         return new View.OnClickListener() {
             public void onClick(View v) {
-                Toast.makeText(getActivity(), button.getId() + "", Toast.LENGTH_LONG).show();
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v="
                         + KEYS.get(button.getId()))));
 
